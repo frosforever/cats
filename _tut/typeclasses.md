@@ -1,12 +1,12 @@
-# Typeclasses
+# Type classes
 
-The typeclass pattern is a ubiquitous pattern in Scala, its function
+The type class pattern is a ubiquitous pattern in Scala, its function
 is to provide a behavior for some type. You think of it as an
 "interface" in the Java sense. Here's an example.
 
 ```scala
 scala> /**
-     |  * A typeclass to provide textual representation
+     |  * A type class to provide textual representation
      |  */
      | trait Show[A] {
      |   def show(f: A): String
@@ -15,49 +15,49 @@ defined trait Show
 ```
 This class says that a value of type `Show[A]` has a way to turn `A`s
 into `String`s. Now we can write a function which is polymorphic on
-some A, as long as we have some value of Show[A], so that our function
-can have a way of producing a String:
+some `A`, as long as we have some value of `Show[A]`, so that our function
+can have a way of producing a `String`:
 
 ```scala
 scala> def log[A](a: A)(implicit s: Show[A]) = println(s.show(a))
 log: [A](a: A)(implicit s: Show[A])Unit
 ```
 
-If we now try to call log, without supplying a Show instance, we will
+If we now try to call log, without supplying a `Show` instance, we will
 get a compilation error:
 
 ```scala
 scala> log("a string")
-<console>:11: error: could not find implicit value for parameter s: Show[String]
-              log("a string")
-                 ^
+<console>:14: error: could not find implicit value for parameter s: Show[String]
+       log("a string")
+          ^
 ```
 
-It is trivial to supply a Show instance for String:
+It is trivial to supply a `Show` instance for `String`:
 
 ```scala
 scala> implicit val stringShow = new Show[String] {
      |   def show(s: String) = s
      | }
-stringShow: Show[String] = $anon$1@15aa913c
+stringShow: Show[String] = $anon$1@68531a0e
 
 scala> // and now our call to Log succeeds
      | log("a string")
 a string
 ```
 
-This example demonstrates a powerful property of the typeclass
-pattern. We have been able to provide an implementation of Show for
-String, without needing to change the definition of java.lang.String
+This example demonstrates a powerful property of the type class
+pattern. We have been able to provide an implementation of `Show` for
+`String`, without needing to change the definition of `java.lang.String`
 to extend a new Java-style interface; something we couldn't have done
 even if we wanted to, since we don't control the implementation of
-java.lang.String. We use this pattern to retrofit existing
+`java.lang.String`. We use this pattern to retrofit existing
 types with new behaviors. This is usually referred to as "ad-hoc
 polymorphism".
 
-For some types, providing a Show instance might depend on having some
-implicit Show instance of some other type, for instance, we could
-implement Show for Option:
+For some types, providing a `Show` instance might depend on having some
+implicit `Show` instance of some other type, for instance, we could
+implement `Show` for `Option`:
 
 ```scala
 scala> implicit def optionShow[A](implicit sa: Show[A]) = new Show[Option[A]] {
